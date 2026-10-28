@@ -1,0 +1,12 @@
+path_id,from_role_id,to_role_id,typical_timeline_months,prerequisite_competencies,recommended_action_plan
+CP001,R001,R002,12,"Project Management (L4), Decision Making (L4), Digital Governance (L4)","1. Complete Project Management Essentials course.
+2. Practice milestone tracking and vendor SLA simulation.
+3. Take Decision Making mock assessments.
+4. Participate in AI Mock Interview for Project Officer role."
+CP002,R001,R003,24,"Government Drafting (L5), Decision Making (L4), Public Procurement (L4), Ethics (L4)","1. Master Advanced CSMOP & Cabinet Note preparation.
+2. Complete GFR 2017 compliance certification.
+3. Lead complex inter-ministerial consultations.
+4. Take Under Secretary Mock Interview series."
+CP003,R002,R004,18,"Digital Governance (L5), Project Management (L4), Citizen Centricity (L4)","1. Complete Cloud Architecture & Data Literacy advanced module.
+2. Lead departmental API integration project.
+3. Pass Digital Governance Lead competency benchmark."

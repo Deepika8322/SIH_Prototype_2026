@@ -1,0 +1,827 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Karmayogi Prototype v2.0 | Civil Service Competency & Career Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="/static/styles.css" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            knavy: { 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
+            ksaffron: { 500: '#f97316', 600: '#ea580c', 700: '#c2410c' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col antialiased">
+  <header class="bg-knavy-900 text-white border-b border-slate-700 shadow-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-ksaffron-600 to-amber-400 flex items-center justify-center font-bold text-white shadow-lg text-lg tracking-wider">
+            KY
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-lg text-white tracking-tight">AI Karmayogi</span>
+              <span class="bg-ksaffron-500/20 text-ksaffron-400 text-xs px-2 py-0.5 rounded-full border border-ksaffron-500/30 font-mono font-medium">v2.0 Prototype</span>
+            </div>
+            <p class="text-xs text-slate-400 hidden sm:block">RAG + LLM Competency, Learning & Career Development Assistant</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <div class="flex items-center bg-slate-800/80 rounded-lg px-2.5 py-1.5 border border-slate-700">
+            <i data-lucide="user" class="w-4 h-4 text-slate-400 mr-2"></i>
+            <span class="text-xs text-slate-400 mr-1.5 hidden md:inline">Learner:</span>
+            <select id="userSelect" class="bg-transparent text-xs font-semibold text-white focus:outline-none cursor-pointer">
+              <option value="U001" class="bg-slate-900 text-white">Aarav Sharma (Section Officer)</option>
+              <option value="U002" class="bg-slate-900 text-white">Priya Patel (Under Secretary)</option>
+            </select>
+          </div>
+
+          <button id="resetStateBtn" title="Reset demo competency scores to baseline" class="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors border border-transparent hover:border-slate-700 flex items-center text-xs space-x-1">
+            <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+            <span class="hidden lg:inline text-xs">Reset Demo</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-knavy-950 border-t border-slate-800/80">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="flex space-x-1 sm:space-x-2 overflow-x-auto py-1 text-sm no-scrollbar" id="mainNav">
+          <button data-tab="dashboard" class="nav-tab active flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="layout-dashboard" class="w-4 h-4 text-ksaffron-400"></i>
+            <span>Dashboard</span>
+          </button>
+          <button data-tab="interview" class="nav-tab flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="mic" class="w-4 h-4 text-blue-400"></i>
+            <span>AI Mock Interview</span>
+          </button>
+          <button data-tab="skill-gap" class="nav-tab flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>
+            <span>Skill Gap Analysis</span>
+          </button>
+          <button data-tab="career" class="nav-tab flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="map" class="w-4 h-4 text-amber-400"></i>
+            <span>Career Path</span>
+          </button>
+          <button data-tab="syllabus" class="nav-tab flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="book-open" class="w-4 h-4 text-indigo-400"></i>
+            <span>Common Syllabus</span>
+          </button>
+          <button data-tab="tests" class="nav-tab flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="check-square" class="w-4 h-4 text-rose-400"></i>
+            <span>AI Mock Tests</span>
+          </button>
+          <button data-tab="mentor" class="nav-tab flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="bot" class="w-4 h-4 text-purple-400"></i>
+            <span>AI Personal Mentor</span>
+          </button>
+          <button data-tab="passport" class="nav-tab flex items-center space-x-1.5 px-3 py-2 rounded-md text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/50">
+            <i data-lucide="award" class="w-4 h-4 text-teal-400"></i>
+            <span>Progress Passport</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="bg-amber-50 border-b border-amber-200 px-4 py-2 text-xs text-amber-900">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600 flex-shrink-0"></i>
+        <span><strong>Prototype Notice:</strong> Inspired by Karmayogi/iGOT learning model. Synthetic demo records — not an official government recruitment, transfer, or eligibility platform.</span>
+      </div>
+      <span class="hidden md:inline-block font-mono text-[10px] bg-amber-200/60 text-amber-900 px-1.5 py-0.5 rounded">RAG Grounded + Dynamic LLM</span>
+    </div>
+  </div>
+
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- TAB 1: EXECUTIVE DASHBOARD -->
+    <section id="tab-dashboard" class="tab-content space-y-6">
+      <div class="bg-gradient-to-r from-knavy-900 via-slate-800 to-knavy-900 rounded-xl p-6 text-white shadow-md relative overflow-hidden border border-slate-700">
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-ksaffron-400 uppercase tracking-wider mb-1">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+              <span>Civil Service Competency Assistant</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white tracking-tight" id="dashUserName">Welcome, Aarav Sharma</h1>
+            <div class="flex flex-wrap items-center gap-2 mt-2 text-xs text-slate-300">
+              <span class="bg-slate-700/80 px-2.5 py-1 rounded-md border border-slate-600">Current: <strong id="dashCurrentRole" class="text-white">Section Officer</strong></span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-400"></i>
+              <span class="bg-ksaffron-500/20 text-ksaffron-300 px-2.5 py-1 rounded-md border border-ksaffron-500/30">Target: <strong id="dashTargetRole" class="text-white">Project Officer</strong></span>
+              <span class="bg-slate-700/50 px-2 py-1 rounded text-slate-300" id="dashDepartment">Admin Reforms</span>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 bg-slate-800/80 p-3 rounded-lg border border-slate-700/80">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-ksaffron-400" id="dashProgressPercent">68.5%</div>
+              <div class="text-[10px] text-slate-400 uppercase font-medium">Readiness Index</div>
+            </div>
+            <div class="h-8 w-px bg-slate-700"></div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-emerald-400" id="dashCompCount">7</div>
+              <div class="text-[10px] text-slate-400 uppercase font-medium">Competencies</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <div class="karmayogi-card p-5 border-l-4 border-l-ksaffron-500 bg-gradient-to-br from-white to-orange-50/30">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center space-x-2 text-xs font-semibold text-ksaffron-600 uppercase">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                <span>Recommended Next Learning Action</span>
+              </div>
+              <button onclick="app.explainRecommendation('REC_ACTION_1')" class="text-xs text-blue-600 hover:text-blue-800 flex items-center space-x-1 font-medium">
+                <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                <span>Why am I seeing this?</span>
+              </button>
+            </div>
+            <h3 class="text-base font-bold text-slate-900" id="dashActionTitle">Bridge Project Management Gap (Level 2 → Level 4)</h3>
+            <p class="text-xs text-slate-600 mt-1" id="dashActionDesc">Complete Module 1 of Project Management Essentials for Public Officers and take the 5-question diagnostic mock assessment.</p>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button onclick="app.switchTab('tests')" class="bg-ksaffron-500 hover:bg-ksaffron-600 text-white text-xs font-medium px-3.5 py-1.5 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+                <i data-lucide="play" class="w-3.5 h-3.5"></i>
+                <span>Take Diagnostic Test</span>
+              </button>
+              <button onclick="app.switchTab('skill-gap')" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-medium px-3.5 py-1.5 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+                <span>View Full Gap Matrix</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="karmayogi-card p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="target" class="w-4 h-4 text-emerald-600"></i>
+                <h3 class="text-sm font-bold text-slate-900">Top Competency Gaps for Target Role</h3>
+              </div>
+              <button onclick="app.switchTab('skill-gap')" class="text-xs text-blue-600 hover:underline font-medium">View All</button>
+            </div>
+            <div class="space-y-3" id="dashTopGapsContainer"></div>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="karmayogi-card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-blue-600"></i>
+                <h3 class="text-sm font-bold text-slate-900">Active Courses</h3>
+              </div>
+              <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-medium">iGOT Tracks</span>
+            </div>
+            <div class="space-y-3" id="dashCoursesContainer"></div>
+          </div>
+
+          <div class="karmayogi-card p-5">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="check-circle-2" class="w-4 h-4 text-purple-600"></i>
+                <h3 class="text-sm font-bold text-slate-900">Recent Mock Tests</h3>
+              </div>
+              <button onclick="app.switchTab('tests')" class="text-xs text-blue-600 hover:underline font-medium">Practice</button>
+            </div>
+            <div class="space-y-2.5" id="dashRecentTestsContainer"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- TAB 2: AI MOCK INTERVIEW -->
+    <section id="tab-interview" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-blue-600 uppercase">
+              <i data-lucide="mic" class="w-4 h-4"></i>
+              <span>Feature 1 — AI Mock Interview Simulator</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Situational & STAR Competency Interview</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Grounded in civil service interview frameworks, GFR, CSMOP, and discretionary judgment scoring.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="badge-verified text-[11px] px-2 py-1 rounded font-medium flex items-center space-x-1">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              <span>RAG Grounded</span>
+            </span>
+          </div>
+        </div>
+
+        <div id="interviewSetupCard" class="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Target Role</label>
+              <select id="interviewRoleSelect" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Competency Focus</label>
+              <select id="interviewCompSelect" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="Auto">Auto (Balanced Role Competencies)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Questions Count</label>
+              <select id="interviewCountSelect" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="3">3 Questions (Quick Drill)</option>
+                <option value="5" selected>5 Questions (Standard Round)</option>
+                <option value="8">8 Questions (In-Depth Board)</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button id="startInterviewBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>Start Mock Interview</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="interviewActiveCard" class="space-y-5 hidden mt-6">
+          <div class="flex items-center justify-between bg-slate-100 px-4 py-2.5 rounded-lg border border-slate-200">
+            <div class="flex items-center space-x-2">
+              <span class="bg-blue-600 text-white font-bold text-xs px-2 py-0.5 rounded" id="interviewQProgress">Q 1/5</span>
+              <span class="text-xs font-semibold text-slate-700" id="interviewQComp">Competency: Decision Making</span>
+            </div>
+            <span class="badge-generated text-[10px] px-2 py-0.5 rounded font-mono font-medium" id="interviewQSource">Prototype Question</span>
+          </div>
+
+          <div class="p-4 bg-blue-50/50 border border-blue-100 rounded-lg">
+            <div class="text-xs text-blue-800 font-semibold mb-1 flex items-center space-x-1">
+              <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+              <span>Interview Board Question:</span>
+            </div>
+            <p class="text-sm font-semibold text-slate-900" id="interviewQText">Loading question...</p>
+            <div class="mt-2 text-xs text-slate-500 italic" id="interviewQFocus">Focus: Behavioral / STAR Format</div>
+          </div>
+
+          <details class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-200 cursor-pointer">
+            <summary class="font-medium text-slate-700 select-none flex items-center space-x-1">
+              <i data-lucide="info" class="w-3.5 h-3.5 text-blue-500"></i>
+              <span>Recommended STAR Format Tips</span>
+            </summary>
+            <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-slate-200 text-[11px]">
+              <div><strong>Situation:</strong> Outline the specific context or problem.</div>
+              <div><strong>Task:</strong> State your administrative role and objective.</div>
+              <div><strong>Action:</strong> Describe rules followed and steps taken.</div>
+              <div><strong>Result:</strong> State measurable citizen/department outcome.</div>
+            </div>
+          </details>
+
+          <div class="space-y-2">
+            <label class="block text-xs font-semibold text-slate-700">Your Response:</label>
+            <textarea id="interviewAnswerInput" rows="5" class="w-full border border-slate-300 rounded-lg p-3 text-xs text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Structure your answer using the STAR format. Cite relevant civil service administrative principles or rules where appropriate..."></textarea>
+            <div class="flex justify-between items-center text-xs text-slate-400">
+              <span>Be concise, balanced, and evidence-driven.</span>
+              <button id="submitAnswerBtn" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                <span>Submit Response for AI Evaluation</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="interviewEvalCard" class="border border-slate-200 rounded-lg p-5 bg-white space-y-4 shadow-sm hidden">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div class="flex items-center space-x-2">
+                <i data-lucide="award" class="w-4 h-4 text-ksaffron-500"></i>
+                <h4 class="text-sm font-bold text-slate-900">Board Assessment & Scoring</h4>
+              </div>
+              <div class="flex items-center space-x-1 bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-0.5 rounded-full text-xs font-bold">
+                <span>Average:</span>
+                <span id="evalAvgScore">4.0 / 5.0</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs" id="evalDimensionsGrid"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs pt-2">
+              <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-lg">
+                <strong class="text-emerald-800 flex items-center space-x-1 mb-1">
+                  <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                  <span>Observed Strengths:</span>
+                </strong>
+                <ul class="list-disc list-inside text-emerald-900 space-y-1" id="evalStrengthsList"></ul>
+              </div>
+              <div class="bg-amber-50 border border-amber-100 p-3 rounded-lg">
+                <strong class="text-amber-800 flex items-center space-x-1 mb-1">
+                  <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                  <span>Areas for Improvement:</span>
+                </strong>
+                <ul class="list-disc list-inside text-amber-900 space-y-1" id="evalWeaknessesList"></ul>
+              </div>
+            </div>
+
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs text-slate-700">
+              <strong>Coach Narrative:</strong>
+              <p class="mt-1" id="evalNarrativeText"></p>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <button id="nextInterviewQBtn" class="bg-ksaffron-500 hover:bg-ksaffron-600 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+                <span>Next Question</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+
+          <div id="interviewFinalReportCard" class="border border-slate-200 rounded-lg p-6 bg-white space-y-5 shadow-sm hidden">
+            <div class="text-center max-w-lg mx-auto">
+              <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-2">
+                <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+              </div>
+              <h3 class="text-lg font-bold text-slate-900">Interview Simulation Completed</h3>
+              <p class="text-xs text-slate-500" id="finalReportRole">Role: Project Officer</p>
+              <div class="text-3xl font-extrabold text-slate-900 mt-2" id="finalOverallScore">4.1 / 5.0</div>
+              <p class="text-xs text-slate-600 mt-2" id="finalReportSummary"></p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div class="border border-slate-200 p-3.5 rounded-lg bg-slate-50">
+                <h4 class="font-bold text-slate-800 mb-2">Key Competencies Demonstrated</h4>
+                <ul class="list-disc list-inside text-slate-600 space-y-1" id="finalStrengthsList"></ul>
+              </div>
+              <div class="border border-slate-200 p-3.5 rounded-lg bg-slate-50">
+                <h4 class="font-bold text-slate-800 mb-2">Actionable Recommendations</h4>
+                <ul class="list-disc list-inside text-slate-600 space-y-1" id="finalActionsList"></ul>
+              </div>
+            </div>
+
+            <div class="flex justify-center pt-2">
+              <button onclick="app.restartInterview()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-5 py-2 rounded-lg shadow-sm flex items-center space-x-2 transition-colors">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Start New Interview Session</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: SKILL GAP ANALYSIS -->
+    <section id="tab-skill-gap" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-emerald-600 uppercase">
+              <i data-lucide="target" class="w-4 h-4"></i>
+              <span>Feature 2 — Deterministic Skill Gap Analysis</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Competency Deficiency & Growth Matrix</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Calculated in application code: <code>gap = required_level - current_level</code> with RAG-grounded learning paths.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <label class="text-xs font-semibold text-slate-600">Target Role:</label>
+            <select id="gapTargetRoleSelect" class="bg-slate-50 border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none"></select>
+          </div>
+        </div>
+
+        <div class="bg-emerald-50/70 border border-emerald-200 rounded-lg p-3.5 text-xs text-emerald-900 flex items-start space-x-2.5">
+          <i data-lucide="info" class="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5"></i>
+          <div id="gapOverallSummary">Loading analysis...</div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border border-slate-200 rounded-lg overflow-hidden">
+            <thead class="bg-slate-100 text-slate-700 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-3 px-4">Competency</th>
+                <th class="py-3 px-3">Domain</th>
+                <th class="py-3 px-3 text-center">Current Level</th>
+                <th class="py-3 px-3 text-center">Required Level</th>
+                <th class="py-3 px-3 text-center">Calculated Gap</th>
+                <th class="py-3 px-3">Priority</th>
+                <th class="py-3 px-4">Recommended Action</th>
+              </tr>
+            </thead>
+            <tbody id="skillGapTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: CAREER PATH PLANNER -->
+    <section id="tab-career" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-amber-600 uppercase">
+              <i data-lucide="map" class="w-4 h-4"></i>
+              <span>Feature 3 — Career Path Progression Planner</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Personalized Career Roadmap</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Visual step-by-step career path from your current position to target leadership roles.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <label class="text-xs font-semibold text-slate-600">Target Role:</label>
+            <select id="careerTargetRoleSelect" class="bg-slate-50 border border-slate-300 rounded-md px-3 py-1.5 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none"></select>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200 rounded-xl p-5">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center space-x-2 text-xs text-amber-800 font-medium mb-1">
+                <span id="careerFromRole">Section Officer</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-amber-600"></i>
+                <span class="font-bold text-slate-900" id="careerToRole">Project Officer</span>
+              </div>
+              <h3 class="text-base font-bold text-slate-900" id="careerReadinessStatus">Progressing Well (Target: 75% Benchmark)</h3>
+              <p class="text-xs text-slate-600 mt-1" id="careerActionPlanSummary">Action plan summary...</p>
+            </div>
+            <div class="text-center bg-white px-5 py-3 rounded-lg border border-amber-200 shadow-sm">
+              <div class="text-2xl font-extrabold text-amber-600" id="careerReadinessScore">65.0%</div>
+              <div class="text-[10px] text-slate-500 uppercase font-semibold">Readiness Benchmark</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">4-Phase Progression Roadmap</h4>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3" id="careerRoadmapGrid"></div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Target Competency Benchmarks</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3" id="careerCompsGrid"></div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Curated iGOT Course Sequence</h4>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="careerCoursesGrid"></div>
+        </div>
+      </div>
+    </section>
+    <!-- TAB 5: COMMON SYLLABUS -->
+    <section id="tab-syllabus" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-indigo-600 uppercase">
+              <i data-lucide="book-open" class="w-4 h-4"></i>
+              <span>Feature 4 — Civil Service Common Syllabus</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Curriculum Modules & AI Syllabus Tutor</h2>
+            <p class="text-xs text-slate-500 mt-0.5">6 foundational public administration modules grounded in official iGOT capacity blueprints.</p>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2" id="syllabusCategoryPills"></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="syllabusCardsGrid"></div>
+
+        <div class="border-2 border-indigo-100 bg-gradient-to-br from-indigo-50/50 to-white rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-xs">AI</div>
+              <div>
+                <h4 class="text-sm font-bold text-slate-900">AI Syllabus Tutor & Grounded Advisor</h4>
+                <p class="text-xs text-slate-500">Select any module above or ask a curriculum question.</p>
+              </div>
+            </div>
+            <span class="badge-official text-[10px] px-2 py-0.5 rounded font-mono" id="syllabusSourceTag">RAG: common_syllabus.md</span>
+          </div>
+
+          <div class="flex flex-wrap gap-2 text-xs">
+            <button onclick="app.askSyllabusTutor('explain')" class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg shadow-sm font-medium transition-colors">
+              📖 Explain this Module
+            </button>
+            <button onclick="app.askSyllabusTutor('study_plan')" class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg shadow-sm font-medium transition-colors">
+              📅 2-Week Study Plan
+            </button>
+            <button onclick="app.askSyllabusTutor('quiz')" class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg shadow-sm font-medium transition-colors">
+              ❓ Diagnostic Quiz Review
+            </button>
+            <button onclick="app.askSyllabusTutor('skills')" class="bg-white hover:bg-indigo-50 text-indigo-700 border border-indigo-200 px-3 py-1.5 rounded-lg shadow-sm font-medium transition-colors">
+              🎯 Target Competencies
+            </button>
+          </div>
+
+          <div class="flex gap-2">
+            <input type="text" id="syllabusCustomInput" placeholder="Ask any question about syllabus rules, exam topics, or learning outcomes..." class="flex-1 border border-slate-300 rounded-lg px-3.5 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white" />
+            <button onclick="app.askSyllabusTutor('custom')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+              <span>Ask Tutor</span>
+              <i data-lucide="send" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <div id="syllabusResponseBox" class="bg-white border border-indigo-100 rounded-lg p-4 text-xs text-slate-700 space-y-2 hidden shadow-sm">
+            <div class="font-bold text-indigo-900 flex items-center space-x-1">
+              <i data-lucide="bot" class="w-4 h-4 text-indigo-600"></i>
+              <span id="syllabusRespTitle">Tutor Response</span>
+            </div>
+            <div id="syllabusRespContent" class="leading-relaxed whitespace-pre-line"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: AI MOCK TESTS -->
+    <section id="tab-tests" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-5">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-rose-600 uppercase">
+              <i data-lucide="check-square" class="w-4 h-4"></i>
+              <span>Feature 5 — Dynamic AI Mock Tests</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Adaptive MCQ Diagnostic Assessments</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Retrieves matching database questions and dynamically generates missing MCQs using RAG grounded context.</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="badge-generated text-[11px] px-2.5 py-1 rounded-md font-mono font-medium">Dynamic Generation Mode C</span>
+          </div>
+        </div>
+
+        <div id="testSetupCard" class="bg-slate-50 border border-slate-200 rounded-lg p-4 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Topic / Competency</label>
+              <select id="testTopicSelect" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-rose-500 focus:outline-none"></select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Difficulty Level</label>
+              <select id="testDifficultySelect" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                <option value="foundational">Foundational (Level 1-2)</option>
+                <option value="medium" selected>Medium / Applied (Level 3-4)</option>
+                <option value="hard">Advanced / Scenario (Level 4-5)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Question Count (Triggers Dynamic Gen)</label>
+              <select id="testCountSelect" class="w-full bg-white border border-slate-300 rounded-md px-3 py-2 text-xs text-slate-800 focus:ring-2 focus:ring-rose-500 focus:outline-none">
+                <option value="5">5 Questions (Fast Check)</option>
+                <option value="10" selected>10 Questions (Dynamic RAG Fallback)</option>
+                <option value="15">15 Questions (Full Assessment)</option>
+                <option value="20">20 Questions (Comprehensive Battery)</option>
+              </select>
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <button id="generateTestBtn" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Generate Mock Assessment</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="testActiveCard" class="space-y-5 hidden mt-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-100 px-4 py-2.5 rounded-lg border border-slate-200 text-xs">
+            <div class="flex items-center space-x-2">
+              <span class="font-bold text-slate-800" id="testActiveTopic">Topic: Project Management</span>
+              <span class="text-slate-400">|</span>
+              <span class="text-slate-600" id="testActiveDifficulty">Medium</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <span class="badge-prototype text-[10px] px-2 py-0.5 rounded font-mono" id="testRetrievedCount">3 DB</span>
+              <span class="badge-generated text-[10px] px-2 py-0.5 rounded font-mono" id="testGeneratedCount">7 Generated</span>
+              <span class="bg-rose-600 text-white font-bold px-2 py-0.5 rounded text-[10px]" id="testProgressCount">Q 1 of 10</span>
+            </div>
+          </div>
+
+          <div class="p-5 bg-white border border-slate-200 rounded-xl space-y-4 shadow-sm">
+            <div class="flex items-start justify-between gap-2">
+              <h3 class="text-sm font-bold text-slate-900 leading-snug" id="testQuestionText">Loading question...</h3>
+              <span class="badge-generated text-[10px] px-2 py-0.5 rounded font-mono flex-shrink-0" id="testQuestionSource">AI Generated</span>
+            </div>
+
+            <div class="space-y-2.5 pt-2" id="testOptionsContainer"></div>
+          </div>
+
+          <div class="flex items-center justify-between pt-2">
+            <button id="testPrevBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold px-4 py-2 rounded-lg transition-colors flex items-center space-x-1">
+              <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+              <span>Previous</span>
+            </button>
+            <div class="flex space-x-2">
+              <button id="testNextBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold px-4 py-2 rounded-lg transition-colors flex items-center space-x-1">
+                <span>Next</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+              <button id="testSubmitBtn" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-5 py-2 rounded-lg shadow-sm transition-colors flex items-center space-x-1.5">
+                <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                <span>Submit & View Explanations</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="testReviewCard" class="space-y-5 hidden mt-6">
+          <div class="bg-gradient-to-r from-slate-900 to-knavy-900 text-white rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <span class="text-xs font-semibold text-rose-400 uppercase">Assessment Results</span>
+              <h3 class="text-2xl font-bold text-white mt-1" id="testReviewScore">8 / 10 (80.0%)</h3>
+              <p class="text-xs text-slate-300 mt-1" id="testReviewFeedback">Excellent performance! You demonstrate strong proficiency.</p>
+            </div>
+            <div id="testCompetencyUpgradeBadge" class="hidden bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-3 py-2 rounded-lg text-xs font-medium flex items-center space-x-2">
+              <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+              <span id="testUpgradeText">Competency Level Upgraded!</span>
+            </div>
+          </div>
+
+          <div class="space-y-3" id="testReviewQuestionsList"></div>
+
+          <div class="flex justify-center pt-3">
+            <button onclick="app.restartTest()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-5 py-2.5 rounded-lg shadow-sm transition-colors flex items-center space-x-1.5">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Attempt Another Assessment</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: AI PERSONAL MENTOR -->
+    <section id="tab-mentor" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-purple-600 uppercase">
+              <i data-lucide="bot" class="w-4 h-4"></i>
+              <span>Feature 6 — AI Personal Mentor & Capacity Coach</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Continuous Capacity Development Coaching</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Context-aware mentor grounded in your current gaps, test attempts, and civil service guidelines.</p>
+          </div>
+          <span class="badge-verified text-[11px] px-2 py-1 rounded font-medium flex items-center space-x-1">
+            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+            <span>User Profile Aware</span>
+          </span>
+        </div>
+
+        <div class="flex flex-wrap gap-2 text-xs">
+          <button onclick="app.sendMentorPreset('I am weak in decision making and procurement. What should I do first?')" class="bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1.5 rounded-full transition-colors">
+            💬 Weak in Decision Making
+          </button>
+          <button onclick="app.sendMentorPreset('How can I prepare effectively for transitioning from Section Officer to Project Officer?')" class="bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1.5 rounded-full transition-colors">
+            🎯 Target Role Roadmap
+          </button>
+          <button onclick="app.sendMentorPreset('Give me a 15-minute practical exercise on milestone-based vendor management.')" class="bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1.5 rounded-full transition-colors">
+            ⏱️ 15-Min Practical Exercise
+          </button>
+          <button onclick="app.sendMentorPreset('Explain the key GFR 2017 procurement thresholds and single tender exceptions.')" class="bg-purple-50 hover:bg-purple-100 text-purple-800 border border-purple-200 px-3 py-1.5 rounded-full transition-colors">
+            📜 GFR Procurement Guidance
+          </button>
+        </div>
+
+        <div id="mentorChatStream" class="bg-slate-50 border border-slate-200 rounded-xl p-4 min-h-[380px] max-h-[500px] overflow-y-auto space-y-4">
+          <div class="flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-sm">
+              KY
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-4 text-xs text-slate-700 shadow-sm max-w-2xl space-y-2">
+              <div class="font-bold text-purple-900 flex items-center space-x-1">
+                <span>AI Karmayogi Mentor</span>
+                <span class="badge-official text-[10px] px-1.5 py-0.2 rounded font-mono">Civil Service Coach</span>
+              </div>
+              <p>Namaste! I am your continuous competency mentor. I have analyzed your current profile as a <strong>Section Officer</strong> aiming for <strong>Project Officer</strong>. You have demonstrated strong baseline communication and ethics scores, while your highest-leverage growth area is <strong>Project Management & Discretionary Decision Making</strong>.</p>
+              <p>How can I support your development today? Ask for a scenario challenge, study plan, or guidance on standard office procedures.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <input type="text" id="mentorInput" placeholder="Type your message to the AI Mentor..." class="flex-1 border border-slate-300 rounded-lg px-4 py-2.5 text-xs text-slate-800 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-white shadow-sm" />
+          <button id="sendMentorBtn" class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold px-5 py-2.5 rounded-lg shadow-sm flex items-center space-x-1.5 transition-colors">
+            <span>Send</span>
+            <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 8: COMPETENCY PROGRESS PASSPORT -->
+    <section id="tab-passport" class="tab-content space-y-6 hidden">
+      <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-100 pb-4">
+          <div>
+            <div class="flex items-center space-x-2 text-xs font-semibold text-teal-600 uppercase">
+              <i data-lucide="award" class="w-4 h-4"></i>
+              <span>Competency Progress Passport</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Personal Civil Service Learning Record</h2>
+            <p class="text-xs text-slate-500 mt-0.5">Demonstrates the complete developmental cycle: <code>Gap → Course → Practice → Assessment → Updated Level</code>.</p>
+          </div>
+          <button onclick="app.resetUserProgress()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium px-3.5 py-1.5 rounded-lg border border-slate-300 transition-colors flex items-center space-x-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>Reset Demo Baseline</span>
+          </button>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+          <div>
+            <span class="text-slate-400 block">Learner Name</span>
+            <strong class="text-slate-900 text-sm" id="passUserName">Aarav Sharma</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block">Cadre / Department</span>
+            <strong class="text-slate-900 text-sm" id="passUserDept">Administrative Reforms</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block">Current Position</span>
+            <strong class="text-slate-900 text-sm" id="passCurrentRole">Section Officer (R001)</strong>
+          </div>
+          <div>
+            <span class="text-slate-400 block">Development Role</span>
+            <strong class="text-slate-900 text-sm text-ksaffron-600" id="passTargetRole">Project Officer (R002)</strong>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-bold text-slate-800 uppercase tracking-wider">Evaluated Competency Taxonomy (1 to 5 Scale)</h4>
+          <div class="space-y-3" id="passportCompetenciesContainer"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+          <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/50 space-y-3">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+              <i data-lucide="check-square" class="w-4 h-4 text-rose-500"></i>
+              <span>Diagnostic Mock Test History</span>
+            </h4>
+            <div class="space-y-2" id="passTestHistoryList"></div>
+          </div>
+
+          <div class="border border-slate-200 rounded-lg p-4 bg-slate-50/50 space-y-3">
+            <h4 class="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+              <i data-lucide="mic" class="w-4 h-4 text-blue-500"></i>
+              <span>AI Mock Interview History</span>
+            </h4>
+            <div class="space-y-2" id="passInterviewHistoryList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- EXPLAINABILITY MODAL -->
+  <div id="explainModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-150">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div class="flex items-center space-x-2 text-ksaffron-600 font-bold text-sm">
+          <i data-lucide="help-circle" class="w-4 h-4"></i>
+          <span>Explainability: Evidence & Source Rationale</span>
+        </div>
+        <button onclick="app.closeExplainModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-700">
+        <div class="bg-amber-50 border border-amber-200 p-3 rounded-lg flex items-center justify-between">
+          <div>
+            <span class="text-amber-800 font-semibold block">Competency Gap Evidence:</span>
+            <span id="explainGapText">Current Level 2 → Target Level 4 (Gap: 2)</span>
+          </div>
+          <span class="badge-prototype text-[10px] px-2 py-0.5 rounded font-mono" id="explainSourceBadge">Verified Reference</span>
+        </div>
+
+        <div>
+          <strong class="text-slate-900 block mb-1">Grounding Evidence Chain:</strong>
+          <ul class="list-disc list-inside space-y-1 text-slate-600" id="explainEvidenceList"></ul>
+        </div>
+
+        <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+          <strong class="text-slate-900 block mb-1">Expected Learning Outcome:</strong>
+          <p id="explainOutcomeText"></p>
+        </div>
+
+        <p class="text-[11px] text-slate-400 italic pt-1">
+          * Disclaimer: Recommendations are synthesized based on prototype competency blueprints and do not constitute official government service determinations.
+        </p>
+      </div>
+
+      <div class="flex justify-end pt-2">
+        <button onclick="app.closeExplainModal()" class="bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <footer class="bg-knavy-950 border-t border-slate-800 text-slate-400 text-xs py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 text-center space-y-1">
+      <p>AI Karmayogi Prototype v2.0 • Independent RAG + LLM Civil Service Assistant • Built for pair-programming demonstration</p>
+      <p class="text-[11px] text-slate-400">Inspired by the objectives of the National Programme for Civil Services Capacity Building (NPCSCB / Mission Karmayogi).</p>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

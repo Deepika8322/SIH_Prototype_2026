@@ -1,0 +1,19 @@
+module_id,module_name,category,description,duration_hours,learning_objectives,related_competencies
+SYL001,Public Service & Ethics,Public Service,"Foundations of democratic governance, civil service conduct rules, constitutional values, public integrity, and conflict of interest management.",20,"1. Understand civil service values and constitutional framework.
+2. Master conflict-of-interest identification and mitigation.
+3. Uphold transparency, empathy, and accountability in everyday administration.","C003, C001"
+SYL002,Digital Government & Emerging Technologies,Digital Government,"Architecture of India Stack (Aadhaar, UPI, DigiLocker, e-Office), data privacy regulations, cybersecurity best practices, and AI applications in public service delivery.",30,"1. Understand India Stack architecture and API frameworks.
+2. Apply data privacy and cyber hygiene standards.
+3. Identify opportunities for AI and workflow automation in public service.","C005, C002"
+SYL003,"Administrative Noting, Drafting & Parliamentary Procedures",Communication,"Mastery of Central Secretariat Manual of Office Procedure (CSMOP), precision noting, cabinet note preparation, legislative drafting basics, and answering Parliamentary Questions (Starred/Unstarred).",25,"1. Draft structured, persuasive, and legally sound office notes.
+2. Prepare comprehensive replies to Parliament questions and Standing Committees.
+3. Formulate cabinet summaries with inter-ministerial consensus.","C004, C001"
+SYL004,Problem Solving & Analytical Decision Making,Problem Solving,"Evidence-based policymaking, statistical analysis, root-cause diagnostics, stakeholder consensus building, and crisis management frameworks.",25,"1. Apply data-driven decision trees to policy problems.
+2. Evaluate multi-stakeholder trade-offs with risk matrices.
+3. Manage crisis decision protocols with agility and accountability.","C001, C002"
+SYL005,General Financial Rules & Public Procurement,Administration,"Deep dive into GFR 2017, GeM 4.0 operations, budgeting, expenditure control, audit compliance, contract management, and vigilance guidelines.",35,"1. Master GFR 2017 provisions and financial delegations.
+2. Execute end-to-end procurement on GeM (L1, Custom Bids, RA).
+3. Ensure seamless audit compliance and vigilance clearance.","C006, C001"
+SYL006,Project Management & Mission Execution,Project Management,"Mission-mode project lifecycle, Work Breakdown Structures (WBS), Gantt charts, vendor SLA management, milestone monitoring dashboards, and public scheme evaluation.",30,"1. Design project charters and milestone schedules for government schemes.
+2. Enforce vendor accountability and SLA performance.
+3. Manage project risk registers and contingency plans.","C002, C005"

@@ -1,0 +1,8 @@
+role_id,role_name,department,description,level_min,level_max
+R001,Section Officer,General Administration,"Supervises clerical staff, file management, noting and drafting, and monitoring routine department operations.",2,3
+R002,Project Officer,Mission & E-Governance,"Manages digital governance initiatives, milestone tracking, inter-department coordination, and vendor SLA management.",3,4
+R003,Under Secretary,Policy & Planning,"Conducts policy appraisal, inter-ministerial consultations, parliamentary question handling, and administrative sanctions.",3,5
+R004,Digital Governance Lead,Information Technology,"Leads citizen digital service delivery, data privacy, cloud architecture standards, and emerging technology adoption.",4,5
+R005,Administrative Officer,Establishment & Personnel,"Oversees personnel administration, procurement rules compliance (GFR/GeM), grievance redressal, and budgeting.",2,4
+R006,Procurement Specialist,Finance & Contracts,"Specializes in public procurement through GeM, tender management, contract lifecycle oversight, and financial rules.",3,5
+R007,Citizen Services Officer,Public Grievances,"Handles frontline public service delivery, grievance resolution under CPGRAMS, citizen charter adherence, and empathy.",2,4
